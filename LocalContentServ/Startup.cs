@@ -1,10 +1,4 @@
-namespace StaticFileAccess {
-  using System;
-  using System.Collections.Generic;
-  using System.Diagnostics.CodeAnalysis;
-  using System.Linq;
-  using System.Threading.Tasks;
-
+namespace LocalContentServ {
   using Microsoft.AspNetCore.Builder;
   using Microsoft.AspNetCore.Hosting;
   using Microsoft.AspNetCore.StaticFiles;
@@ -13,6 +7,11 @@ namespace StaticFileAccess {
   using Microsoft.Extensions.FileProviders;
   using Microsoft.Extensions.Hosting;
   using Microsoft.Extensions.Options;
+
+  using System;
+  using System.Collections.Generic;
+  using System.Diagnostics.CodeAnalysis;
+  using System.Linq;
 
   public class Startup {
     public Startup(IConfiguration configuration) {
@@ -39,7 +38,7 @@ namespace StaticFileAccess {
       app.UseStaticFiles();
       var StaticFileServCfg = app.ApplicationServices.GetRequiredService<StaticFileServCfg[]>().Distinct().ToArray();
       var FileExtenProvider = new FileExtensionContentTypeProvider();
-      
+
       Array.ForEach(StaticFileServCfg, E => {
         app.UseStaticFiles(new StaticFileOptions() {
           FileProvider = new PhysicalFileProvider(E.RootPath),
@@ -75,6 +74,6 @@ namespace StaticFileAccess {
     public int CompareTo([AllowNull] StaticFileServCfg other) => RootUrl.CompareTo(other.RootUrl);
     public int Compare([AllowNull] StaticFileServCfg x, [AllowNull] StaticFileServCfg y) => x.CompareTo(y);
 
-    public override string ToString() => $"{RootUrl} At {RootPath} | {(EnableBrowsing?"Browsing":"Guessing")}";
+    public override string ToString() => $"{RootUrl} At {RootPath} | {(EnableBrowsing ? "Browsing" : "Guessing")}";
   }
 }

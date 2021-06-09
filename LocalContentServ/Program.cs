@@ -1,4 +1,4 @@
-namespace StaticFileAccess {
+namespace LocalContentServ {
   using Microsoft.AspNetCore;
   using Microsoft.AspNetCore.Hosting;
   using Microsoft.AspNetCore.Hosting.WindowsServices;
