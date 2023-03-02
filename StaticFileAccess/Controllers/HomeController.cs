@@ -1,33 +1,42 @@
 ﻿namespace StaticFileAccess.Controllers {
-  using System;
-  using System.Collections.Generic;
-  using System.Diagnostics;
-  using System.Linq;
-  using System.Threading.Tasks;
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Options;
+    using StaticFileAccess.Models;
 
-  using Microsoft.AspNetCore.Mvc;
-  using Microsoft.Extensions.Logging;
+    public class HomeController : Controller {
+        private readonly ILogger<HomeController> _logger;
+        private readonly IOptions<StaticFileServCfgs> FilePathes;
+        public HomeController(ILogger<HomeController> logger, IOptions<StaticFileServCfgs> FilePathes) {
+            _logger = logger;
+            this.FilePathes = FilePathes;
+        }
 
-  using StaticFileAccess.Models;
+        public IActionResult Index() {
+            
+            return View(FilePathes.Value.Pathes.Select(E => E.RootUrl).Distinct().ToArray());
+        }
+        [HttpGet]
+        public IActionResult Upload() {
+            return View();
+        }
+        [HttpPost]
+        public IActionResult UploadFile(IFormFile Upload) {
+            if (Upload != null) {
+                using (var FS = System.IO.File.Create(System.IO.Path.Combine(FilePathes.Value.UploadTo, Upload.FileName))) {
+                    using (var UploadStm = Upload.OpenReadStream()) {
+                        UploadStm.CopyTo(FS);
+                    }
+                }
+            }
+            return RedirectToAction("Upload");
+        }
 
-  public class HomeController : Controller {
-    private readonly ILogger<HomeController> _logger;
-
-    public HomeController(ILogger<HomeController> logger) {
-      _logger = logger;
     }
-
-    public IActionResult Index() {
-      return View();
-    }
-
-    public IActionResult Privacy() {
-      return View();
-    }
-
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error() {
-      return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-    }
-  }
 }
